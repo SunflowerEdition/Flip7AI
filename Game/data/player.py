@@ -1,0 +1,77 @@
+from dataclasses import dataclass, field
+from enum import auto, Enum
+
+from Game.data.cards import CardId, CARD_METADATA, CardCategory, ActionType
+
+
+class AddCardResult(Enum):
+    SAFE = auto()
+    BUSTED = auto()
+    SECOND_CHANCE_USED = auto()
+
+
+@dataclass
+class Player:
+    number_cards: set[CardId] = field(default_factory=set)
+    modifier_cards: list[CardId] = field(default_factory=list) # separate from number cards to future-proof multi-deck
+
+    busted: bool = False
+    frozen: bool = False
+    second_chance: bool = False
+    score: int = 0
+
+    def add_card(self, card_id: CardId) -> AddCardResult:
+        """
+        Add a card to the player.
+
+        :param card_id: The id of the card to add
+        :return: The result of adding the card: safe, busted, or a second chance used
+        """
+        card_category = CARD_METADATA[card_id].category
+
+        # Action card is played on the player
+        if card_category == CardCategory.ACTION:
+            if CARD_METADATA[card_id].action == ActionType.FREEZE:
+                if self.frozen or self.busted:
+                    raise RuntimeError(f'Attempted to freeze a frozen ({self.frozen}) or busted ({self.busted}) player')
+                self.frozen = True
+            elif CARD_METADATA[card_id].action == ActionType.SECOND_CHANCE:
+                self.second_chance = True
+            elif CARD_METADATA[card_id].action == ActionType.FLIP_THREE:
+                raise RuntimeError(f"Flip three card played on player. This shouldn't get to here!")
+            else:
+                raise RuntimeError(f'Unknown card category {card_category}')
+
+        # Modifier cards simply get added
+        elif card_category == CardCategory.MODIFIER:
+            self.modifier_cards.append(card_id)
+
+        # Number cards need to verify if busted
+        elif card_category == CardCategory.NUMBER:
+            if card_id in self.number_cards:
+                if self.second_chance:
+                    self.second_chance = False
+                    return AddCardResult.SECOND_CHANCE_USED
+                self.busted = True
+                return AddCardResult.BUSTED
+            else:
+                self.number_cards.add(card_id)
+
+        else:
+            raise RuntimeError(f'Unknown card category {card_category}')
+
+        return AddCardResult.SAFE
+
+    def is_active(self) -> bool:
+        return (not self.busted) and (not self.frozen)
+
+    def reset_round(self) -> None:
+        self.number_cards.clear()
+        self.modifier_cards.clear()
+        self.busted = False
+        self.frozen = False
+        self.second_chance = False
+
+    def reset_game(self) -> None:
+        self.reset_round()
+        self.score = 0
