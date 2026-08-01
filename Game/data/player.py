@@ -12,9 +12,10 @@ class AddCardResult(Enum):
 
 @dataclass
 class Player:
-    number_cards: set[CardId] = field(default_factory=set)
+    number_cards: list[CardId] = field(default_factory=list)
     modifier_cards: list[CardId] = field(default_factory=list) # separate from number cards to future-proof multi-deck
 
+    stayed: bool = False
     busted: bool = False
     frozen: bool = False
     second_chance: bool = False
@@ -52,10 +53,11 @@ class Player:
                 if self.second_chance:
                     self.second_chance = False
                     return AddCardResult.SECOND_CHANCE_USED
+                self.number_cards.append(card_id)
                 self.busted = True
                 return AddCardResult.BUSTED
             else:
-                self.number_cards.add(card_id)
+                self.number_cards.append(card_id)
 
         else:
             raise RuntimeError(f'Unknown card category {card_category}')
@@ -63,11 +65,41 @@ class Player:
         return AddCardResult.SAFE
 
     def is_active(self) -> bool:
-        return (not self.busted) and (not self.frozen)
+        return (not self.stayed) and (not self.busted) and (not self.frozen) and (len(self.number_cards) < 7)
+
+    def flipped_seven(self) -> bool:
+        return (not self.busted) and (len(self.number_cards) >= 7)
+
+    def count_score(self) -> int:
+        # Bonus points if player flipped seven
+        bonus = 0
+        if len(self.number_cards) >= 7:
+            bonus += 15
+
+        # Sum all number cards
+        number_total = 0
+        for card_id in self.number_cards:
+            number_total += CARD_METADATA[card_id].value
+
+        # Sum all modifiers and check for multipliers
+        modifier_total = 0
+        times_two_found = 0
+        for card_id in self.modifier_cards:
+            if card_id == CardId.TIMES_2:
+                times_two_found += 1
+            else:
+                modifier_total += CARD_METADATA[card_id].value
+
+        # Times twos multiply number total only
+        for _ in range(times_two_found):
+            number_total *= 2
+
+        return number_total + modifier_total + bonus
 
     def reset_round(self) -> None:
         self.number_cards.clear()
         self.modifier_cards.clear()
+        self.stayed = False
         self.busted = False
         self.frozen = False
         self.second_chance = False
