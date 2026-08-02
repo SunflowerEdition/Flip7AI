@@ -1,29 +1,47 @@
+"""Card type definitions and the static metadata table describing every
+card in a standard Flip 7 deck.
+"""
+
 from dataclasses import dataclass
 from enum import Enum, auto, IntEnum
 
 
 class CardCategory(Enum):
+    """The three broad kinds of card: number, action, or modifier."""
     NUMBER = auto()
     ACTION = auto()
     MODIFIER = auto()
 
 class ActionType(Enum):
+    """The three action cards: Freeze, Flip Three, and Second Chance."""
     FREEZE = auto()
     FLIP_THREE = auto()
     SECOND_CHANCE = auto()
 
 class ModifierType(Enum):
+    """The two modifier cards: a flat point bonus (+2/+4/+6/+8/+10) or a x2 multiplier."""
     PLUS_POINTS = auto()
     MULTIPLIER = auto()
 
 @dataclass(frozen=True)
 class CardInfo:
+    """Static metadata describing one card.
+
+    "value" holds the number value for NUMBER cards or the bonus/multiplier
+    amount for MODIFIER cards, and is None for ACTION cards. "action" and
+    "modifier" are populated only for their respective categories.
+    """
     category: CardCategory
     value: int | None = None
     action: ActionType | None = None
     modifier: ModifierType | None = None
 
 class CardId(IntEnum):
+    """Unique identifier for every physical card in the deck.
+
+    Values 0-12 correspond directly to the NUMBER_n cards (so int(CardId.NUMBER_7) == 7),
+    which create_deck() relies on when building the number-card portion of the deck.
+    """
     NUMBER_0 = 0
     NUMBER_1 = 1
     NUMBER_2 = 2
@@ -47,6 +65,7 @@ class CardId(IntEnum):
     FLIP_THREE = 20
     SECOND_CHANCE = 21
 
+# Maps every CardId to its static metadata. Indexed directly by CardId throughout the codebase
 CARD_METADATA = {
     CardId.NUMBER_0: CardInfo(category=CardCategory.NUMBER, value=0),
     CardId.NUMBER_1: CardInfo(category=CardCategory.NUMBER, value=1),
