@@ -33,8 +33,8 @@ def resolve_drawn_card(
     :param state: The state of the game
     :param player_idx: The index of the player playing the card
     :param card_id: The ID of the card being played
-    :param agents: List of agents
-    :param rng: Random generator
+    :param agents: List of agents playing the game.
+    :param rng: The random number generator
     """
     event_queue: list[Event] = []
 
@@ -91,6 +91,14 @@ def resolve_drawn_card(
         state.discard_pile.append(card_id)
 
 def end_round(state: GameState) -> None:
+    """End the round of the game.
+
+    This function starts by counting the scores of each player, then cleaning
+    up the cards by adding the cards from the players hands to the discard pile,
+    and finally resetting the game for the next round.
+
+    :param state: The state of the game.
+    """
     # Count all scores
     for player in state.players:
         if player.busted:
