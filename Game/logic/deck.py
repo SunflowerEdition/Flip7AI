@@ -1,5 +1,7 @@
 import random
 
+import numpy as np
+
 from Game.data.cards import CardId
 from Game.data.game_state import GameState
 
@@ -12,6 +14,12 @@ def create_deck() -> list[CardId]:
     deck.extend([CardId.PLUS_2, CardId.PLUS_4, CardId.PLUS_6, CardId.PLUS_8, CardId.PLUS_10, CardId.TIMES_2])
     deck.extend([CardId.FREEZE] * 3 + [CardId.FLIP_THREE] * 3 + [CardId.SECOND_CHANCE] * 3)
     return deck
+
+def count_unseen_cards(pile: list[CardId]) -> np.ndarray:
+    counts = np.zeros(len(CardId), dtype=np.int8)
+    for card_id in pile:
+        counts[card_id] += 1
+    return counts
 
 def draw_card(state: GameState, rng: random.Random) -> CardId:
     # If there are no more cards left in the deck, shuffle the discard pile and replace it

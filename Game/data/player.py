@@ -15,6 +15,7 @@ class Player:
     number_cards: list[CardId] = field(default_factory=list)
     modifier_cards: list[CardId] = field(default_factory=list) # separate from number cards to future-proof multi-deck
 
+    dealt_first_card: bool = False
     stayed: bool = False
     busted: bool = False
     frozen: bool = False
@@ -99,6 +100,7 @@ class Player:
     def reset_round(self) -> None:
         self.number_cards.clear()
         self.modifier_cards.clear()
+        self.dealt_first_card = False
         self.stayed = False
         self.busted = False
         self.frozen = False
