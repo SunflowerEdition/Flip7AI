@@ -1,8 +1,8 @@
 import random
-from Game.data.game_state import GameState
-from Game.data.player import Player
-from Game.logic.deck import create_deck, count_unseen_cards, draw_card
-from Game.logic.rules import resolve_drawn_card, end_round
+from game.data.game_state import GameState
+from game.data.player import Player
+from game.logic.deck import create_deck, count_unseen_cards, draw_card
+from game.logic.rules import resolve_drawn_card, end_round
 from agents.base_agent import Agent, Decision
 
 

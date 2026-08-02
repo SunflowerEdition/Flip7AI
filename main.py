@@ -1,5 +1,5 @@
 from agents.random_agent import RandomAgent
-from Game.logic.game_loop import play_game
+from game.logic.game_loop import play_game
 import random
 
 if __name__ == '__main__':

@@ -2,8 +2,8 @@ import random
 
 import numpy as np
 
-from Game.data.cards import CardId
-from Game.data.game_state import GameState
+from game.data.cards import CardId
+from game.data.game_state import GameState
 
 
 def create_deck() -> list[CardId]:

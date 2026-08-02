@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import auto, Enum
 
-from Game.data.cards import CardId, CARD_METADATA, CardCategory, ActionType
+from game.data.cards import CardId, CARD_METADATA, CardCategory, ActionType
 
 
 class AddCardResult(Enum):

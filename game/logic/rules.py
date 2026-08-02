@@ -1,7 +1,7 @@
-from Game.data.cards import CardId, CARD_METADATA, ActionType, CardCategory
-from Game.data.game_state import GameState
-from Game.data.player import AddCardResult
-from Game.logic.deck import draw_card
+from game.data.cards import CardId, CARD_METADATA, ActionType, CardCategory
+from game.data.game_state import GameState
+from game.data.player import AddCardResult
+from game.logic.deck import draw_card
 from agents.base_agent import Agent
 from typing import NamedTuple
 import random
