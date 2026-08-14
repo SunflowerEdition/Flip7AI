@@ -1,18 +1,21 @@
 import random
+
 from game.data.game_state import GameState
 from game.data.player import Player
 from game.logic.deck import create_deck, count_unseen_cards, draw_card
 from game.logic.rules import resolve_drawn_card, end_round
 from agents.base_agent import Agent, Decision
+from game.render.pygame_renderer import CardRenderer
 
 
-def play_game(agents: list[Agent], rng: random.Random, target_score: int = 200, max_rounds: int = 1000) -> GameState:
+def play_game(agents: list[Agent], rng: random.Random, target_score: int = 200, max_rounds: int = 1000, renderer: CardRenderer | None = None) -> GameState:
     """Play a full game to the target score.
 
     :param agents: List of agents playing the game.
     :param rng: The random number generator.
     :param target_score: The target score to play to (200 per the game rules).
     :param max_rounds: The maximum number of rounds to play (prevents soft-locks).
+    :param renderer: The renderer to use.
     :return: The final state of the game.
     """
     state = new_game_state(len(agents), rng)
@@ -21,14 +24,14 @@ def play_game(agents: list[Agent], rng: random.Random, target_score: int = 200, 
         if state.round_number > max_rounds:
             break
 
-        play_round(state, agents, rng)
+        play_round(state, agents, rng, renderer)
         state.round_number += 1
         state.update_starting_player_idx()
 
     return state
 
 
-def play_round(state: GameState, agents: list[Agent], rng: random.Random) -> None:
+def play_round(state: GameState, agents: list[Agent], rng: random.Random, renderer: CardRenderer | None = None) -> None:
     """Play a single round of the game.
 
     A round is finished when all players are frozen/bust, or until one player Flips 7.
@@ -36,6 +39,7 @@ def play_round(state: GameState, agents: list[Agent], rng: random.Random) -> Non
     :param state: The current game state.
     :param agents: List of agents playing the game.
     :param rng: The random number generator.
+    :param renderer: The renderer to use.
     """
     round_active = True
     while round_active:
@@ -50,9 +54,14 @@ def play_round(state: GameState, agents: list[Agent], rng: random.Random) -> Non
 
         if decision == Decision.STAY:
             state.players[state.current_player_idx].stayed = True
+            if renderer:
+                renderer.render(state, message=f"Player {state.current_player_idx} STAYING")
         else:
             drawn_card_id = draw_card(state, rng)
-            resolve_drawn_card(state, state.current_player_idx, drawn_card_id, agents, rng)
+            if renderer:
+                renderer.render(state, drawn_card=True, player_idx=state.current_player_idx, card_id=drawn_card_id,
+                                message=f"Player {state.current_player_idx} drew {drawn_card_id._name_}")
+            resolve_drawn_card(state, state.current_player_idx, drawn_card_id, agents, rng, renderer)
             if state.anyone_flipped_seven():
                 break
         round_active = state.update_active_player_idx()
