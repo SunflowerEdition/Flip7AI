@@ -2,6 +2,9 @@ import random
 
 import pygame
 
+from agents.num_cards_agent import NumCardsAgent
+from agents.num_points_agent import NumPointsAgent
+from agents.player_agent import PlayerAgent
 from agents.random_agent import RandomAgent
 from game.logic.game_loop import play_game
 from game.render.pygame_renderer import CardRenderer
@@ -15,8 +18,14 @@ if __name__ == '__main__':
     pygame.display.set_caption("Flip 7")
 
     rng = random.Random()
-    agents = [RandomAgent(rng) for _ in range(num_players)]
-    renderer = CardRenderer(screen, num_players, logging=True, steps=True)
+    agents = [
+        NumCardsAgent(3, "3 Cards"),
+        NumCardsAgent(4, "4 Cards"),
+        NumCardsAgent(5, "5 Cards"),
+        NumPointsAgent(23, "23 Points"),
+        NumPointsAgent(10, "10 Points")
+    ]
+    renderer = CardRenderer(screen, num_players, logging=False, steps=True)
 
     final_state = play_game(agents, rng, renderer=renderer)
 
