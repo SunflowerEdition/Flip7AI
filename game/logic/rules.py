@@ -6,6 +6,8 @@ from agents.base_agent import Agent
 from typing import NamedTuple
 import random
 
+from game.render.pygame_renderer import CardRenderer
+
 
 class Event(NamedTuple):
     player_idx: int
@@ -17,7 +19,8 @@ def resolve_drawn_card(
         player_idx: int,
         card_id: CardId,
         agents: list[Agent],
-        rng: random.Random
+        rng: random.Random,
+        renderer: CardRenderer | None = None
 ) -> None:
     """Resolve the specified card. Called recursively if Flip Three is played.
 
@@ -35,6 +38,7 @@ def resolve_drawn_card(
     :param card_id: The ID of the card being played
     :param agents: List of agents playing the game.
     :param rng: The random number generator
+    :param renderer: The game renderer.
     """
     event_queue: list[Event] = []
 
@@ -45,6 +49,8 @@ def resolve_drawn_card(
             # If a second chance is used (on Number) both the second chance and card get discard immediately
             state.discard_pile.append(card_id)
             state.discard_pile.append(CardId.SECOND_CHANCE)
+            if renderer is not None:
+                renderer.render(state, message=f"Second chance and {card_id._name_} discarded.")
         return
 
     # Otherwise it's an action card and handle accordingly
@@ -54,6 +60,8 @@ def resolve_drawn_card(
     # If there are no targets available, the card is discarded
     if not targets:
         state.discard_pile.append(card_id)
+        if renderer is not None:
+            renderer.render(state, message=f"No legal targets, {card_id._name_} discarded.")
         return
 
     # Select the target using the associated agent
@@ -62,6 +70,8 @@ def resolve_drawn_card(
 
     if action_type in (ActionType.FREEZE, ActionType.SECOND_CHANCE):
         target_player.add_card(card_id)
+        if renderer is not None:
+            renderer.render(state, message=f"Player {target_idx} gains {action_type._name_}.")
     else: # Flip Three
         for _ in range(3):
             # If player is no longer active or flipped seven, stop drawing cards
@@ -70,6 +80,9 @@ def resolve_drawn_card(
 
             # Resolve card right away unless Freeze or Flip Three
             drawn_card_id = draw_card(state, rng)
+            if renderer is not None:
+                renderer.render(state, drawn_card=True, player_idx=target_idx, card_id=drawn_card_id,
+                                message=f"Player {target_idx} drew {drawn_card_id._name_} (FLIP THREE)")
             if drawn_card_id in [CardId.FREEZE, CardId.FLIP_THREE]:
                 event_queue.append(Event(player_idx=target_idx, card_id=drawn_card_id))
             else:
