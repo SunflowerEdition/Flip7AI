@@ -46,7 +46,7 @@ def play_round(state: GameState, agents: list[Agent], rng: random.Random) -> Non
             current_player.dealt_first_card = True
             decision = Decision.DRAW
         else:
-            decision = agents[state.current_player_idx].choose_action(state)
+            decision = agents[state.current_player_idx].choose_action(state, state.current_player_idx)
 
         if decision == Decision.STAY:
             state.players[state.current_player_idx].stayed = True

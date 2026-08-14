@@ -57,7 +57,7 @@ def resolve_drawn_card(
         return
 
     # Select the target using the associated agent
-    target_idx = agents[player_idx].choose_target(state, action_type, targets)
+    target_idx = agents[player_idx].choose_target(state, player_idx, action_type, targets)
     target_player = state.players[target_idx]
 
     if action_type in (ActionType.FREEZE, ActionType.SECOND_CHANCE):
