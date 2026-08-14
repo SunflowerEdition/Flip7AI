@@ -6,7 +6,8 @@ from agents.base_agent import Agent, Decision
 
 
 class RandomAgent(Agent):
-    def __init__(self, rng: random.Random):
+    def __init__(self, rng: random.Random, name: str):
+        super().__init__(name)
         self._rng = rng
 
     def choose_action(self, state: GameState, player_idx: int) -> Decision:

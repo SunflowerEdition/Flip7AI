@@ -11,6 +11,9 @@ class Decision(Enum):
 
 
 class Agent(ABC):
+    def __init__(self, name: str) -> None:
+        self.name = name
+
     @abstractmethod
     def choose_action(self, state: GameState, player_idx: int) -> Decision:
         """
