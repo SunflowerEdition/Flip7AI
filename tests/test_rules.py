@@ -3,11 +3,11 @@ import random
 from game.data.cards import CardId
 from game.data.player import Player
 from game.logic.rules import resolve_drawn_card, end_round
-from tests.conftest import create_test_state, TestingAgent
+from tests.conftest import create_test_state, AlwaysDrawAgent
 import numpy as np
 
 
-agents = [TestingAgent(), TestingAgent(), TestingAgent(), TestingAgent(), TestingAgent()]
+agents = [AlwaysDrawAgent("Agent 1"), AlwaysDrawAgent("Agent 2"), AlwaysDrawAgent("Agent 3"), AlwaysDrawAgent("Agent 4"), AlwaysDrawAgent("Agent 5")]
 
 def test_resolve_drawing_number():
     players = [Player(), Player(), Player(), Player(), Player()]
@@ -101,7 +101,7 @@ def test_resolve_freeze():
 def test_resolve_flip_three():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
     draw_pile=[CardId.NUMBER_2, CardId.TIMES_2, CardId.PLUS_10]
-    game_state = create_test_state(draw_pile=draw_pile, players=players)
+    game_state = create_test_state(draw_pile=draw_pile, discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.FLIP_THREE, agents=agents, rng=random.Random())
 
     player = players[0]
@@ -142,7 +142,7 @@ def test_resolve_flip_three_bust():
 def test_resolve_flip_three_freeze():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
     draw_pile = [CardId.TIMES_2, CardId.PLUS_10, CardId.FREEZE]
-    game_state = create_test_state(draw_pile=draw_pile, players=players)
+    game_state = create_test_state(draw_pile=draw_pile, discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.FLIP_THREE, agents=agents, rng=random.Random())
 
     player = players[0]
@@ -157,13 +157,13 @@ def test_resolve_flip_three_freeze():
     assert (player.frozen == True)
     assert (player.second_chance == False)
     assert (player.score == 0)
-    np.testing.assert_array_equal(game_state.draw_pile, [])
+    np.testing.assert_array_equal(game_state.draw_pile, [CardId.NUMBER_2])
     np.testing.assert_array_equal(game_state.discard_pile, [CardId.FLIP_THREE])
 
 def test_resolve_flip_three_freeze_and_bust():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
     draw_pile = [CardId.NUMBER_2, CardId.NUMBER_2, CardId.FREEZE]
-    game_state = create_test_state(draw_pile=draw_pile, players=players)
+    game_state = create_test_state(draw_pile=draw_pile, discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.FLIP_THREE, agents=agents, rng=random.Random())
 
     player = players[0]
@@ -177,13 +177,13 @@ def test_resolve_flip_three_freeze_and_bust():
     assert (player.frozen == False)
     assert (player.second_chance == False)
     assert (player.score == 0)
-    np.testing.assert_array_equal(game_state.draw_pile, [])
+    np.testing.assert_array_equal(game_state.draw_pile, [CardId.NUMBER_2])
     np.testing.assert_array_equal(game_state.discard_pile, [CardId.FREEZE, CardId.FLIP_THREE])
 
 def test_resolve_double_flip_three():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
     draw_pile = [CardId.NUMBER_7, CardId.NUMBER_6, CardId.NUMBER_5, CardId.NUMBER_4, CardId.NUMBER_3, CardId.NUMBER_2, CardId.FLIP_THREE]
-    game_state = create_test_state(draw_pile=draw_pile, players=players)
+    game_state = create_test_state(draw_pile=draw_pile, discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.FLIP_THREE, agents=agents, rng=random.Random())
 
     player = players[0]
@@ -202,13 +202,13 @@ def test_resolve_double_flip_three():
     assert (player.second_chance == False)
     assert (player.score == 0)
     np.testing.assert_array_equal(game_state.draw_pile, [CardId.NUMBER_7])
-    np.testing.assert_array_equal(game_state.discard_pile, [CardId.FLIP_THREE, CardId.FLIP_THREE])
+    np.testing.assert_array_equal(game_state.discard_pile, [CardId.NUMBER_2, CardId.FLIP_THREE, CardId.FLIP_THREE])
 
 def test_resolve_double_flip_three_and_flip_seven():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
     draw_pile = [CardId.NUMBER_7, CardId.NUMBER_6, CardId.NUMBER_5, CardId.NUMBER_4, CardId.NUMBER_3, CardId.NUMBER_2,
                  CardId.FLIP_THREE]
-    game_state = create_test_state(draw_pile=draw_pile, players=players)
+    game_state = create_test_state(draw_pile=draw_pile, discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.NUMBER_12, agents=agents, rng=random.Random())
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.NUMBER_10, agents=agents, rng=random.Random())
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.NUMBER_9, agents=agents, rng=random.Random())
@@ -229,12 +229,12 @@ def test_resolve_double_flip_three_and_flip_seven():
     assert (player.second_chance == False)
     assert (player.score == 0)
     np.testing.assert_array_equal(game_state.draw_pile, [CardId.NUMBER_7, CardId.NUMBER_6, CardId.NUMBER_5])
-    np.testing.assert_array_equal(game_state.discard_pile, [CardId.FLIP_THREE, CardId.FLIP_THREE])
+    np.testing.assert_array_equal(game_state.discard_pile, [CardId.NUMBER_2, CardId.FLIP_THREE, CardId.FLIP_THREE])
 
 def test_resolve_double_flip_three_and_freeze():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
     draw_pile = [CardId.NUMBER_5, CardId.NUMBER_4, CardId.NUMBER_3, CardId.NUMBER_2, CardId.FREEZE, CardId.FLIP_THREE]
-    game_state = create_test_state(draw_pile=draw_pile, players=players)
+    game_state = create_test_state(draw_pile=draw_pile, discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.FLIP_THREE, agents=agents, rng=random.Random())
 
     player = players[0]
@@ -251,13 +251,13 @@ def test_resolve_double_flip_three_and_freeze():
     assert (player.frozen == True)
     assert (player.second_chance == False)
     assert (player.score == 0)
-    np.testing.assert_array_equal(game_state.draw_pile, [])
+    np.testing.assert_array_equal(game_state.draw_pile, [CardId.NUMBER_2])
     np.testing.assert_array_equal(game_state.discard_pile, [CardId.FLIP_THREE, CardId.FLIP_THREE])
 
 def test_resolve_double_flip_three_and_freeze_alt_order():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
     draw_pile = [CardId.NUMBER_5, CardId.NUMBER_4, CardId.NUMBER_3, CardId.NUMBER_2, CardId.FLIP_THREE, CardId.FREEZE]
-    game_state = create_test_state(draw_pile=draw_pile, players=players)
+    game_state = create_test_state(draw_pile=draw_pile, discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.FLIP_THREE, agents=agents, rng=random.Random())
 
     player = players[0]
@@ -272,12 +272,12 @@ def test_resolve_double_flip_three_and_freeze_alt_order():
     assert (player.second_chance == False)
     assert (player.score == 0)
     np.testing.assert_array_equal(game_state.draw_pile, [CardId.NUMBER_5, CardId.NUMBER_4, CardId.NUMBER_3])
-    np.testing.assert_array_equal(game_state.discard_pile, [CardId.FLIP_THREE, CardId.FLIP_THREE])
+    np.testing.assert_array_equal(game_state.discard_pile, [CardId.NUMBER_2, CardId.FLIP_THREE, CardId.FLIP_THREE])
 
 def test_resolve_double_flip_three_and_bust():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
     draw_pile = [CardId.NUMBER_5, CardId.NUMBER_4, CardId.NUMBER_2, CardId.NUMBER_2, CardId.FREEZE, CardId.FLIP_THREE]
-    game_state = create_test_state(draw_pile=draw_pile, players=players)
+    game_state = create_test_state(draw_pile=draw_pile, discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.FLIP_THREE, agents=agents, rng=random.Random())
 
     player = players[0]
@@ -292,11 +292,11 @@ def test_resolve_double_flip_three_and_bust():
     assert (player.second_chance == False)
     assert (player.score == 0)
     np.testing.assert_array_equal(game_state.draw_pile, [CardId.NUMBER_5, CardId.NUMBER_4])
-    np.testing.assert_array_equal(game_state.discard_pile, [CardId.FLIP_THREE, CardId.FREEZE, CardId.FLIP_THREE])
+    np.testing.assert_array_equal(game_state.discard_pile, [CardId.NUMBER_2, CardId.FLIP_THREE, CardId.FREEZE, CardId.FLIP_THREE])
 
 def test_end_round():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
-    game_state = create_test_state(draw_pile=[], players=players)
+    game_state = create_test_state(draw_pile=[], discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.NUMBER_2, agents=agents, rng=random.Random())
     resolve_drawn_card(state=game_state, player_idx=1, card_id=CardId.NUMBER_3, agents=agents, rng=random.Random())
     end_round(game_state)
@@ -314,13 +314,13 @@ def test_end_round():
     assert (players[1].frozen == False)
     assert (players[1].second_chance == False)
     np.testing.assert_array_equal(players[1].number_cards, [])
-    assert(len(game_state.discard_pile) == 2)
+    assert(len(game_state.discard_pile) == 3)
     assert (CardId.NUMBER_2 in game_state.discard_pile)
     assert (CardId.NUMBER_3 in game_state.discard_pile)
 
 def test_end_round_two():
     players = [Player(), Player(), Player(), Player(), Player(), Player()]
-    game_state = create_test_state(draw_pile=[], players=players)
+    game_state = create_test_state(draw_pile=[], discard_pile=[CardId.NUMBER_2], players=players)
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.NUMBER_2, agents=agents, rng=random.Random())
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.TIMES_2, agents=agents, rng=random.Random())
     resolve_drawn_card(state=game_state, player_idx=0, card_id=CardId.SECOND_CHANCE, agents=agents, rng=random.Random())
@@ -334,7 +334,7 @@ def test_end_round_two():
     assert (players[0].second_chance == False)
     np.testing.assert_array_equal(players[0].number_cards, [])
     np.testing.assert_array_equal(players[0].modifier_cards, [])
-    assert(len(game_state.discard_pile) == 4)
+    assert(len(game_state.discard_pile) == 5)
     assert (CardId.NUMBER_2 in game_state.discard_pile)
     assert (CardId.TIMES_2 in game_state.discard_pile)
     assert (CardId.SECOND_CHANCE in game_state.discard_pile)
