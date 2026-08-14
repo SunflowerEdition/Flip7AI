@@ -2,6 +2,7 @@ import random
 
 import pygame
 
+from agents.ev_agent import EVAgent
 from agents.num_cards_agent import NumCardsAgent
 from agents.num_points_agent import NumPointsAgent
 from agents.player_agent import PlayerAgent
@@ -21,11 +22,11 @@ if __name__ == '__main__':
 
     rng = random.Random()
     agents = [
-        NumCardsAgent(3, "3 Cards"),
+        EVAgent("EV Agent"),
         NumCardsAgent(4, "4 Cards"),
         NumCardsAgent(5, "5 Cards"),
         NumPointsAgent(23, "23 Points"),
-        NumPointsAgent(10, "10 Points")
+        RandomAgent(rng, "R1")
     ]
     renderer = CardRenderer(screen, num_players, logging=False, steps=True)
 

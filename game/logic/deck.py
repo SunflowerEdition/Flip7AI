@@ -49,12 +49,16 @@ def draw_card(state: GameState, rng: random.Random) -> CardId:
     :return: The cards drawn from the draw pile.
     """
     if not state.draw_pile:
+        raise RuntimeError("Draw pile was left empty somehow!")
+
+    card = state.draw_pile.pop()
+    state.unseen_cards[card] -= 1
+
+    if not state.draw_pile:
         if not state.discard_pile:
             raise RuntimeError("Draw pile and discard pile both empty")
         state.draw_pile, state.discard_pile = state.discard_pile, []
         state.unseen_cards = count_unseen_cards(state.draw_pile)
         rng.shuffle(state.draw_pile)
 
-    card = state.draw_pile.pop()
-    state.unseen_cards[card] -= 1
     return card

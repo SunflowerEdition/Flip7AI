@@ -7,7 +7,7 @@ from tests.conftest import AlwaysStayAgent, create_test_state, NUM_CARDS_IN_FULL
 
 
 def test_game_cutoff():
-    agents = [AlwaysStayAgent() for _ in range(5)]
+    agents = [AlwaysStayAgent(name="Always Stay Agent") for _ in range(5)]
     state = play_game(agents, random.Random(), max_rounds=5)
     assert (state.round_number == 6)
 
@@ -42,7 +42,7 @@ def test_determine_winner_tied_game():
     assert (determine_winner(game_state, 200) is None)
 
 def test_game_consistency():
-    agents = [RandomAgent(random.Random()) for _ in range(5)]
+    agents = [RandomAgent(random.Random(), "Random Agent") for _ in range(5)]
     for _ in range(100_000):
         game_state = play_game(agents, random.Random())
         cards_in_draw = len(game_state.draw_pile)

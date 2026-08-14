@@ -33,7 +33,7 @@ def create_test_state(
 def create_full_unseen_card_pile():
     return [1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 1, 1, 1, 1, 1, 3, 3, 3]
 
-class TestingAgent(Agent):
+class AlwaysDrawAgent(Agent):
     def choose_action(self, state: GameState, player_idx: int) -> Decision:
         """Always draws a card."""
         return Decision.DRAW

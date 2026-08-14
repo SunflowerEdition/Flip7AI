@@ -1,33 +1,44 @@
 import random
+
+from agents.ev_agent import EVAgent
 from agents.num_cards_agent import NumCardsAgent
 from agents.num_points_agent import NumPointsAgent
+from agents.prob_threshold_agent import ProbThresholdAgent
+from agents.random_agent import RandomAgent
 from game.logic.game_loop import play_game
 
 
 def run_tournament():
     num_games = 1_000_000
+    '''available_agents = [
+        ProbThresholdAgent(threshold=0.05, name="Prob Threshold Agent 0.05"),
+        ProbThresholdAgent(threshold=0.10, name="Prob Threshold Agent 0.10"),
+        ProbThresholdAgent(threshold=0.15, name="Prob Threshold Agent 0.15"),
+        ProbThresholdAgent(threshold=0.20, name="Prob Threshold Agent 0.20"),
+        ProbThresholdAgent(threshold=0.25, name="Prob Threshold Agent 0.25"),
+        ProbThresholdAgent(threshold=0.30, name="Prob Threshold Agent 0.30"),
+        ProbThresholdAgent(threshold=0.35, name="Prob Threshold Agent 0.35"),
+        ProbThresholdAgent(threshold=0.40, name="Prob Threshold Agent 0.40"),
+        ProbThresholdAgent(threshold=0.45, name="Prob Threshold Agent 0.45"),
+        ProbThresholdAgent(threshold=0.50, name="Prob Threshold Agent 0.50"),
+        ProbThresholdAgent(threshold=0.55, name="Prob Threshold Agent 0.55"),
+        ProbThresholdAgent(threshold=0.60, name="Prob Threshold Agent 0.60"),
+        ProbThresholdAgent(threshold=0.65, name="Prob Threshold Agent 0.65"),
+        ProbThresholdAgent(threshold=0.70, name="Prob Threshold Agent 0.70"),
+        ProbThresholdAgent(threshold=0.75, name="Prob Threshold Agent 0.75"),
+        ProbThresholdAgent(threshold=0.80, name="Prob Threshold Agent 0.80"),
+        ProbThresholdAgent(threshold=0.85, name="Prob Threshold Agent 0.85"),
+        ProbThresholdAgent(threshold=0.90, name="Prob Threshold Agent 0.90"),
+        ProbThresholdAgent(threshold=0.95, name="Prob Threshold Agent 0.95"),
+        ProbThresholdAgent(threshold=0.100, name="Prob Threshold Agent 1.00"),
+
+    ]'''
     available_agents = [
-        NumCardsAgent(3, "3 Cards Agent"),
+        EVAgent("EV Agent"),
+        RandomAgent(rng=random.Random(), name="Random Agent"),
         NumCardsAgent(4, "4 Cards Agent"),
-        NumCardsAgent(5, "5 Cards Agent"),
-        NumPointsAgent(16, "16 Points Agent"),
-        NumPointsAgent(17, "17 Points Agent"),
-        NumPointsAgent(18, "18 Points Agent"),
-        NumPointsAgent(19, "19 Points Agent"),
-        NumPointsAgent(20, "20 Points Agent"),
-        NumPointsAgent(21, "21 Points Agent"),
-        NumPointsAgent(22, "22 Points Agent"),
-        NumPointsAgent(23, "23 Points Agent"),
-        NumPointsAgent(24, "24 Points Agent"),
-        NumPointsAgent(25, "25 Points Agent"),
-        NumPointsAgent(26, "26 Points Agent"),
-        NumPointsAgent(27, "27 Points Agent"),
-        NumPointsAgent(28, "28 Points Agent"),
-        NumPointsAgent(29, "29 Points Agent"),
+        ProbThresholdAgent(0.25, "0.25 Prob Agent"),
         NumPointsAgent(30, "30 Points Agent"),
-        NumPointsAgent(31, "31 Points Agent"),
-        NumPointsAgent(32, "32 Points Agent"),
-        NumPointsAgent(33, "33 Points Agent"),
     ]
 
     wins = {agent.name: 0 for agent in available_agents}
@@ -52,4 +63,4 @@ def run_tournament():
 
     for name, win_count, appearance_count in results:
         win_rate = win_count / appearance_count * 100
-        print(f"{name:<20} {win_count:>8} {win_rate:>6.2f}%")
+        print(f"{name:<20}  ({win_count:>8} / {appearance_count} ) {win_rate:>6.2f}%")
