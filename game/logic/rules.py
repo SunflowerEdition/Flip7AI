@@ -1,7 +1,7 @@
-from Game.data.cards import CardId, CARD_METADATA, ActionType, CardCategory
-from Game.data.game_state import GameState
-from Game.data.player import AddCardResult
-from Game.logic.deck import draw_card
+from game.data.cards import CardId, CARD_METADATA, ActionType, CardCategory
+from game.data.game_state import GameState
+from game.data.player import AddCardResult
+from game.logic.deck import draw_card
 from agents.base_agent import Agent
 from typing import NamedTuple
 import random
@@ -57,7 +57,7 @@ def resolve_drawn_card(
         return
 
     # Select the target using the associated agent
-    target_idx = agents[player_idx].choose_target(state, action_type, targets)
+    target_idx = agents[player_idx].choose_target(state, player_idx, action_type, targets)
     target_player = state.players[target_idx]
 
     if action_type in (ActionType.FREEZE, ActionType.SECOND_CHANCE):

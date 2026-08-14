@@ -2,8 +2,8 @@ import random
 
 import numpy as np
 
-from Game.data.cards import CardId
-from Game.data.game_state import GameState
+from game.data.cards import CardId
+from game.data.game_state import GameState
 
 
 def create_deck() -> list[CardId]:
@@ -52,6 +52,7 @@ def draw_card(state: GameState, rng: random.Random) -> CardId:
         if not state.discard_pile:
             raise RuntimeError("Draw pile and discard pile both empty")
         state.draw_pile, state.discard_pile = state.discard_pile, []
+        state.unseen_cards = count_unseen_cards(state.draw_pile)
         rng.shuffle(state.draw_pile)
 
     card = state.draw_pile.pop()

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import auto, Enum
 
-from Game.data.cards import CardId, CARD_METADATA, CardCategory, ActionType
+from game.data.cards import CardId, CARD_METADATA, CardCategory, ActionType
 
 
 class AddCardResult(Enum):
@@ -39,6 +39,8 @@ class Player:
                     raise RuntimeError(f'Attempted to freeze a frozen ({self.frozen}) or busted ({self.busted}) player')
                 self.frozen = True
             elif CARD_METADATA[card_id].action == ActionType.SECOND_CHANCE:
+                if self.second_chance:
+                    raise RuntimeError(f'Double second chance. This is illegal. Logic bug somewhere')
                 self.second_chance = True
             elif CARD_METADATA[card_id].action == ActionType.FLIP_THREE:
                 raise RuntimeError(f"Flip three card played on player. This shouldn't get to here!")
@@ -86,6 +88,9 @@ class Player:
 
         :return: The player's score for the round.
         """
+        if self.busted:
+            return 0
+
         # Bonus points if player flipped seven
         bonus = 0
         if len(self.number_cards) >= 7:

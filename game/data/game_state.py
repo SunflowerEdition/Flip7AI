@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from Game.data.cards import CardId, ActionType
-from Game.data.player import Player
+from game.data.cards import CardId, ActionType
+from game.data.player import Player
 
 
 @dataclass
